@@ -35,6 +35,16 @@ function Compose-Core() {
     Copy-Item -re (Join-Path $msbuildBinDir "SdkResolvers") $outDir
     Copy-Item (Join-Path $msbuildVersionDir "Microsoft.Common.props") (Join-Path $outDir $msbuildVersion)
 }
+function Compose-Cpp140() {
+    Write-Host "Composing Cpp140"
+    $cppDir = Join-Path $outDir "Microsoft.Cpp\v4.0"
+    Create-Directory $cppDir | Out-Null
+	# take it hardcoded from the program files msbuild
+	$msbuildProgramFilesRoot = Join-Path ${env:ProgramFiles(x86)} "MSBuild"
+    $sourceDir = Join-Path $msbuildProgramFilesRoot "Microsoft.Cpp\v4.0\V140"
+
+	Copy-Item -re $sourceDir $cppDir
+}
 
 function Get-Description() {
     $fileInfo = New-Object IO.FileInfo $msbuildExe
@@ -146,6 +156,7 @@ try {
     $importTargetsAfterDir = Join-Path (Join-Path $outDir $msbuildVersion) "Microsoft.Common.targets\ImportAfter"
 
     Ensure-OutDir $outDir
+	Compose-Cpp140
     Compose-Core
     Compose-Projectjson
     Compose-Portable
